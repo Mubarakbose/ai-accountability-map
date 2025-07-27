@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional global overrides */
+body {
+    /* DO NOT set overflow: hidden globally */
+    /* Only do this inside modal-backdrop or modal container */
+}
+
+/* For modal backdrop */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Optional: Modal centering fix (if using plain CSS) */
+.modal-centered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
