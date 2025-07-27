@@ -6,9 +6,8 @@ A traceability and documentation tool for Machine Learning development pipelines
 
 ## 🔍 Preview
 
-_(Add a screenshot or GIF here to show the Accountability Map UI)_
+<img width="787" height="1260" alt="Unified Accountability Map with M1 and M2 in a Pipeline" src="https://github.com/user-attachments/assets/567b0e9a-a1fb-4483-9398-61af407f5443" />
 
----
 
 ## 📌 Key Features
 
@@ -23,9 +22,6 @@ _(Add a screenshot or GIF here to show the Accountability Map UI)_
   - `.csv` datasets or results
   - `.png/.jpg` model charts or explainability plots
 
-- 📉 **Model Forecast Logging (Optional)**  
-  Input data manually or fetch real-time weather → Predict PV output → Log performance metrics + SHAP plots into the map.
-
 ---
 
 ## 🧱 Tech Stack
@@ -35,7 +31,6 @@ _(Add a screenshot or GIF here to show the Accountability Map UI)_
 | **Frontend**   | React, TypeScript, Tailwind CSS, React Flow |
 | **Backend**    | FastAPI, SQLAlchemy, PostgreSQL, Pydantic |
 | **ML Models**  | LSTM (trained for PV generation forecast) |
-| **Explainability** | SHAP (optional integration)           |
 
 ---
 
@@ -130,7 +125,7 @@ Visit: `http://localhost:3000`
 
 ---
 
-## 📍 Next Steps (Optional Phase 2)
+## 📍 Futer work
 
 - SHAP explainability visual integration
 - Forecasting interface (real-time + dataset)
@@ -154,7 +149,7 @@ For major changes, please open an issue first to discuss what you’d like to ch
 
 ## 🧑‍💻 Author
 
-- **Lead Developer / Researcher:** _[Your Name]_
+- **Lead Developer / Researcher:** _[Mubarak (Bose) Ahmad]_
 
 ---
 
