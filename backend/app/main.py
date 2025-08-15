@@ -12,19 +12,21 @@ from routers import (
 
 app = FastAPI()
 
-# ✅ Mount file upload directory before server starts
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+# This file lives at /app/main.py inside the container
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # -> /app
+UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
+os.makedirs(UPLOADS_DIR, exist_ok=True)
 
-# ✅ Allow frontend (React) to access the backend
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For dev; restrict this in production
+    allow_origins=["*"],  # tighten for prod
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Register API routes
 app.include_router(pipeline_stage.router)
 app.include_router(pipeline_method.router)
 app.include_router(pipeline_detail.router)

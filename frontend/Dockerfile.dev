@@ -1,0 +1,16 @@
+# === Frontend (React Dev) ===
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install deps
+COPY package*.json ./
+RUN npm install
+
+# Copy rest
+COPY . .
+
+EXPOSE 3000
+
+# CRA dev server; change if you use Vite/Next
+CMD ["npm", "start"]

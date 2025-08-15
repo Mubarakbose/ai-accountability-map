@@ -17,17 +17,22 @@ class PipelineDetailCreate(BaseModel):
 class PipelineDetailResponse(PipelineDetailCreate):
     id: UUID
     file_path: Optional[str] = None
-    file_url: Optional[str] = None  # <- Add this
+    file_url: Optional[str] = None  # public URL (relative)
 
     class Config:
         from_attributes = True
 
     @staticmethod
     def from_orm_with_url(obj) -> "PipelineDetailResponse":
+        """
+        Build a response from the ORM object and produce a *relative* file_url,
+        e.g. "/uploads/<filename>". This works behind Nginx and locally.
+        """
         detail = PipelineDetailResponse.model_validate(obj)
         if obj.file_path:
             filename = os.path.basename(obj.file_path)
-            detail.file_url = f"http://127.0.0.1:8000/uploads/{filename}"
+            # Relative path so it works in prod (/api proxied) and locally
+            detail.file_url = f"/uploads/{filename}"
         return detail
 
 

@@ -1,36 +1,32 @@
-// ✅ Updated accountabilityService.ts with full types
-
-import axios from "axios";
 import { Stage, Method, Detail, ResponsibleActor } from "../types";
-
-const API_BASE = "http://127.0.0.1:8000";
+import { api } from "./pipelineAPI"; // ← use shared Axios client (baseURL=/api in prod)
 
 // === Stages ===
 export const fetchStages = async (): Promise<Stage[]> => {
-  const res = await axios.get<Stage[]>(`${API_BASE}/pipeline_stages/`);
-  return res.data;
+  const { data } = await api.get<Stage[]>("/pipeline_stages/");
+  return data;
 };
 
 export const fetchStageById = async (id: string): Promise<Stage> => {
-  const res = await axios.get<Stage>(`${API_BASE}/pipeline_stages/${id}`);
-  return res.data;
+  const { data } = await api.get<Stage>(`/pipeline_stages/${id}`);
+  return data;
 };
 
-export const createStage = async (data: {
+export const createStage = async (payload: {
   name: string;
   description: string;
 }): Promise<Stage> => {
-  const res = await axios.post<Stage>(`${API_BASE}/pipeline_stages/`, data);
-  return res.data;
+  const { data } = await api.post<Stage>("/pipeline_stages/", payload);
+  return data;
 };
 
 // === Responsible Actors ===
 export const fetchAllActors = async (): Promise<ResponsibleActor[]> => {
-  const res = await axios.get<ResponsibleActor[]>(`${API_BASE}/responsible_actors/`);
-  return res.data;
+  const { data } = await api.get<ResponsibleActor[]>("/responsible_actors/");
+  return data;
 };
 
-export const createResponsibleActor = async (data: {
+export const createResponsibleActor = async (payload: {
   id: string;
   name: string;
   role: string;
@@ -39,40 +35,39 @@ export const createResponsibleActor = async (data: {
   reasons?: string;
   stage_id?: string;
 }): Promise<{ id: string }> => {
-  const res = await axios.post<{ id: string }>(`${API_BASE}/responsible_actors/`, data);
-  return res.data;
+  const { data } = await api.post<{ id: string }>("/responsible_actors/", payload);
+  return data;
 };
 
 // === Methods ===
 export const fetchMethods = async (): Promise<Method[]> => {
-  const res = await axios.get<Method[]>(`${API_BASE}/pipeline_methods/`);
-  return res.data;
+  const { data } = await api.get<Method[]>("/pipeline_methods/");
+  return data;
 };
 
 export const fetchMethodById = async (id: string): Promise<Method> => {
-  const res = await axios.get<Method>(`${API_BASE}/pipeline_methods/${id}`);
-  return res.data;
+  const { data } = await api.get<Method>(`/pipeline_methods/${id}`);
+  return data;
 };
 
-export const createMethod = async (data: {
+export const createMethod = async (payload: {
   stage_id: string;
   name: string;
   description: string;
   actor_ids: string[];
 }): Promise<Method> => {
-  const res = await axios.post<Method>(`${API_BASE}/pipeline_methods/`, data);
-  return res.data;
+  const { data } = await api.post<Method>("/pipeline_methods/", payload);
+  return data;
 };
 
 // === Details ===
-export const fetchDetailsByMethod = async (method_id: string): Promise<Detail[]> => {
-  const res = await axios.get<Detail[]>(`${API_BASE}/pipeline_details/`, {
-    params: { method_id },
-  });
-  return res.data;
+export const fetchDetailsByMethod = async (methodId: string): Promise<Detail[]> => {
+  // Use the backend's by-method route (cleaner than query param)
+  const { data } = await api.get<Detail[]>(`/pipeline_details/by_method/${methodId}`);
+  return data;
 };
 
-export const createDetail = async (data: {
+export const createDetail = async (payload: {
   method_id: string;
   name: string;
   value: string;
@@ -80,18 +75,14 @@ export const createDetail = async (data: {
   file?: File;
 }): Promise<Detail> => {
   const formData = new FormData();
-  formData.append("method_id", data.method_id);
-  formData.append("name", data.name);
-  formData.append("value", data.value);
-  formData.append("description", data.description);
-  if (data.file) {
-    formData.append("file", data.file);
-  }
+  formData.append("method_id", payload.method_id);
+  formData.append("name", payload.name);
+  formData.append("value", payload.value);
+  formData.append("description", payload.description);
+  if (payload.file) formData.append("file", payload.file);
 
-  const res = await axios.post<Detail>(`${API_BASE}/pipeline_details/`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
+  const { data } = await api.post<Detail>("/pipeline_details/", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
-  return res.data;
+  return data;
 };

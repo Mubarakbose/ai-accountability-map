@@ -20,7 +20,7 @@ export interface Method {
   description: string;
   stage_id: string;
   actors: ResponsibleActor[];
-  timestamp?: string;  // ✅ Add this line
+  timestamp?: string;  
 }
 
 export interface Detail {
