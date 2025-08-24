@@ -68,6 +68,7 @@ frontend/
 ```
 backend/
 ├── requirements.txt   # Python dependencies
+├── init-db/   # Database File (.sql) 
 └── app/
     ├── main.py              # FastAPI app
     ├── database.py          # PostgreSQL setup
@@ -79,33 +80,19 @@ backend/
 
 ---
 
-## 🧪 Local Setup
+## 🧪 Local Setup (How to Run)
 
-### **Backend**
-
+- **Install Docker desktop on you local/virtual machine**
+- **Open your CMD/Powershell Terminal**
+- **Clone this project repository in any directory of your choice (e.g. documents, desktop)**
+- **Give the project folder a suitable name or leave as-is**
+- **Navigate to the project folder in your terminal (from your default terminal directory e.g. cd c:\user\Desktop\ai-accountability-map)**
+- **The run the following command:**
 ```bash
-cd backend
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+docker compose build
+docker compose up
 ```
-
-Ensure your `.env` includes:
-
-```env
-DATABASE_URL=postgresql://user:password@localhost:5432/accountability_db
-```
-
-### **Frontend**
-
-```bash
-cd frontend
-npm install
-npm run start
-```
-
-Visit: `http://localhost:3000`
-
+**Finally open your browser and visit `http://localhost`**
 ---
 
 ## 🔗 API Summary
@@ -154,8 +141,8 @@ For major changes, please open an issue first to discuss what you’d like to ch
 
 ## 🧑‍💻 Author
 
-- **Lead Developer / Researcher:** _[Your Name]_
-
+- **Lead Developer / Researcher:** Mubarak Ahmad B.
+- **Supervisors:** Prof. Dr.-Ing. Hermann de Meer, Prof. Dr. Florian Lemmerich, Anna Volkova
 ---
 
 ## 📖 References
