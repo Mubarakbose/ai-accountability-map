@@ -35,6 +35,41 @@ const NodeModal: React.FC<NodeModalProps> = ({
   const isMethod = node.id.startsWith("method-");
   const isDetail = node.id.startsWith("detail-");
 
+// --- replace your current toApiUrl with this ---
+const toApiUrl = (url?: string) => {
+  if (!url) return "";
+
+  try {
+    const u = new URL(url, window.location.origin);
+
+    // If this points anywhere to /uploads/... (regardless of host), rewrite to /api/uploads/...
+    if (u.pathname.startsWith("/uploads/")) {
+      return `/api${u.pathname}`;
+    }
+
+    // If it's using the docker host (backend) or a non-frontend port, still rewrite if path has uploads
+    if (
+      (u.host === "127.0.0.1:8000" ||
+        u.host === "localhost:8000" ||
+        u.hostname === "backend") &&
+      u.pathname.startsWith("/uploads/")
+    ) {
+      return `/api${u.pathname}`;
+    }
+
+    // Already good (served via nginx)
+    if (u.pathname.startsWith("/api/uploads/")) {
+      return u.pathname;
+    }
+
+    return url; // not an uploads asset; leave it alone (e.g., a doc link)
+  } catch {
+    // Relative path case
+    if (url.startsWith("/uploads/")) return `/api${url}`;
+    return url;
+  }
+};
+
   useEffect(() => {
     const loadContext = async () => {
       if (isDetail) {
@@ -90,7 +125,7 @@ const NodeModal: React.FC<NodeModalProps> = ({
 
   const handleExportPDF = async () => {
     if (reportRef.current) {
-      // Wait for all images to load
+      // Wait for all images to load (important for PDF)
       const images = reportRef.current.querySelectorAll("img");
       await Promise.all(
         Array.from(images).map((img) => {
@@ -104,7 +139,7 @@ const NodeModal: React.FC<NodeModalProps> = ({
         })
       );
 
-      // Add watermark
+      // Watermark
       const watermark = document.createElement("div");
       watermark.innerText = "aidevaccmap";
       Object.assign(watermark.style, {
@@ -116,14 +151,14 @@ const NodeModal: React.FC<NodeModalProps> = ({
         transform: "translate(-50%, -50%) rotate(-30deg)",
         pointerEvents: "none",
         zIndex: "1000",
-      });
+      } as CSSStyleDeclaration);
       reportRef.current.appendChild(watermark);
 
       const opt = {
         margin: 0.5,
         filename: `aidevaccmap-report-${node.id}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true }, // FIX: useCORS enabled
+        html2canvas: { scale: 2, useCORS: true }, // keep CORS
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
       };
 
@@ -211,46 +246,52 @@ const NodeModal: React.FC<NodeModalProps> = ({
                     </div>
                     <div style={{ marginTop: 10 }}>
                       <strong>Details:</strong>
-                      {detailsOfMethod.map((d, i) => (
-                        <div key={d.id} style={{ marginBottom: 20 }}>
-                          <p>
-                            <strong>{d.name}</strong>
-                          </p>
-                          <p>{d.description}</p>
-                          <p>
-                            <em>{d.value}</em>
-                          </p>
-                          {d.file_url && (
-                            <div style={{ marginTop: 10 }}>
-                              {d.file_url.match(/\.(jpeg|jpg|png|gif|bmp|webp)$/i) ? (
-                                <img
-                                  src={d.file_url}
-                                  alt={d.name}
-                                  crossOrigin="anonymous"
-                                  style={{
-                                    width: "100%",
-                                    maxHeight: 200,
-                                    objectFit: "contain",
-                                  }}
-                                />
-                              ) : (
-                                <a
-                                  href={d.file_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download
-                                  style={{ color: "#1976d2", textDecoration: "underline" }}
-                                >
-                                  📄 Download: {d.name}
-                                </a>
-                              )}
-                            </div>
-                          )}
-                          {i !== detailsOfMethod.length - 1 && (
-                            <hr style={{ marginTop: 15 }} />
-                          )}
-                        </div>
-                      ))}
+                      {detailsOfMethod.map((d, i) => {
+                        const safeUrl = toApiUrl(d.file_url);
+                        return (
+                          <div key={d.id} style={{ marginBottom: 20 }}>
+                            <p>
+                              <strong>{d.name}</strong>
+                            </p>
+                            <p>{d.description}</p>
+                            <p>
+                              <em>{d.value}</em>
+                            </p>
+                            {safeUrl && (
+                              <div style={{ marginTop: 10 }}>
+                                {safeUrl.match(/\.(jpeg|jpg|png|gif|bmp|webp)$/i) ? (
+                                  <img
+                                    src={safeUrl}
+                                    alt={d.name}
+                                    // same-origin now; no need for crossOrigin
+                                    loading="lazy"
+                                    style={{
+                                      width: "100%",
+                                      maxHeight: 200,
+                                      objectFit: "contain",
+                                      border: "1px solid #eee",
+                                      borderRadius: 4,
+                                    }}
+                                  />
+                                ) : (
+                                  <a
+                                    href={safeUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    download
+                                    style={{ color: "#1976d2", textDecoration: "underline" }}
+                                  >
+                                    📄 Download: {d.name}
+                                  </a>
+                                )}
+                              </div>
+                            )}
+                            {i !== detailsOfMethod.length - 1 && (
+                              <hr style={{ marginTop: 15 }} />
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                     <hr style={{ marginTop: 20 }} />
                   </div>

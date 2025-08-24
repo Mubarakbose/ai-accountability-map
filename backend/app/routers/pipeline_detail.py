@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, File, Form, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
@@ -46,21 +46,21 @@ def create_detail(
     return PipelineDetailResponse.from_orm_with_url(new_detail)
 
 
+# ✅ Supports both: /pipeline_details/?method_id=...  and  /pipeline_details/ (all)
 @router.get("/", response_model=List[PipelineDetailResponse])
-def get_details(db: Session = Depends(get_db)):
-    details = db.query(PipelineDetail).all()
+def get_details(method_id: Optional[str] = Query(None), db: Session = Depends(get_db)):
+    q = db.query(PipelineDetail)
+    if method_id:
+        q = q.filter(PipelineDetail.method_id == method_id)
+    details = q.all()
     return [PipelineDetailResponse.from_orm_with_url(d) for d in details]
 
 
+# ✅ New path the frontend is calling: /pipeline_details/by_method/{method_id}
 @router.get("/by_method/{method_id}", response_model=List[PipelineDetailResponse])
 def get_details_by_method(method_id: str, db: Session = Depends(get_db)):
-    """Endpoint the frontend calls to fetch details for a specific method."""
-    rows = (
-        db.query(PipelineDetail)
-        .filter(PipelineDetail.method_id == method_id)
-        .all()
-    )
-    return [PipelineDetailResponse.from_orm_with_url(r) for r in rows]
+    details = db.query(PipelineDetail).filter(PipelineDetail.method_id == method_id).all()
+    return [PipelineDetailResponse.from_orm_with_url(d) for d in details]
 
 
 @router.get("/{detail_id}", response_model=PipelineDetailResponse)
