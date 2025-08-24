@@ -6,7 +6,7 @@ A traceability and documentation tool for Machine Learning development pipelines
 
 ## 🔍 Preview
 
-_(Add a screenshot or GIF here to show the Accountability Map UI)_
+<img src="aiMapOverview.png" alt="Accountability Map Overview" />
 
 ---
 
