@@ -1,0 +1,45 @@
+# Root level .dockerignore for Docker build context optimization
+
+# Version control
+.git
+.gitignore
+.gitattributes
+.github
+
+# Documentation
+*.md
+LICENSE
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.editorconfig
+
+# OS
+Thumbs.db
+.DS_Store
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+.circleci/
+
+# Docker files (if building root context)
+.dockerignore
+docker-compose.override.yml
+
+# Development
+node_modules/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Temporary files
+*.tmp
+*.temp
+.log
