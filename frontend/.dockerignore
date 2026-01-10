@@ -43,14 +43,12 @@ Thumbs.db
 .gitlab-ci.yml
 .travis.yml
 
-# Documentation and config files
+# Documentation and config files (README excluded but tsconfig.json needed for build)
 README.md
 CONTRIBUTING.md
 LICENSE
 *.md
 .hintrc
-tsconfig.json
 
-# Package managers
-package-lock.json
+# Package managers (yarn is excluded, but package-lock.json is needed for Docker builds)
 yarn.lock
