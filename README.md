@@ -82,136 +82,216 @@ backend/
 
 ## 🧪 Local Setup (How to Run)
 
-### Prerequisites
+### ⚡ Quick Start (3 Steps)
+
+**The fastest way to get the application running:**
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Mubarakbose/ai-accountability-map.git
+cd ai-accountability-map
+
+# 2. Build and start all services (Docker automatically configures everything)
+docker compose up -d --build
+
+# 3. Open in browser
+# Frontend:  http://localhost
+# API Docs:  http://localhost/api/docs
+```
+
+That's it! All services will be running in the background. ✅
+
+---
+
+### 📋 Prerequisites
+
+Before running the application, ensure you have installed:
 
 - **Docker Desktop** (v20.10+) - [Download here](https://www.docker.com/products/docker-desktop)
 - **Docker Compose** (v1.29+) - Usually included with Docker Desktop
 - **Git** (optional, for cloning) - [Download here](https://git-scm.com/)
 
-### Quick Start with Docker (Recommended)
+**Verify installation:**
+```bash
+docker --version
+docker compose --version
+```
 
-#### 1. **Clone or Download the Repository**
+---
 
-Using Git:
+### 🐳 Running with Docker (Recommended for Everyone)
+
+Docker handles all setup automatically - no need to install Python, Node.js, or PostgreSQL!
+
+#### **Step 1: Clone or Download the Repository**
+
+**Option A - Using Git (Recommended):**
 ```bash
 git clone https://github.com/Mubarakbose/ai-accountability-map.git
 cd ai-accountability-map
 ```
 
-Or download as ZIP and extract it.
+**Option B - Download as ZIP:**
+1. Visit https://github.com/Mubarakbose/ai-accountability-map
+2. Click "Code" → "Download ZIP"
+3. Extract the ZIP file
+4. Open terminal in the extracted folder
 
-#### 2. **Configure Environment Variables**
+#### **Step 2: Build and Run All Services**
 
-Copy the environment template files:
+Run this single command - it builds images and starts everything:
 
-```bash
-# For backend
-cp backend/.env.example backend/.env.docker
-
-# For frontend (optional, if needed)
-cp frontend/.env.example frontend/.env.local
-```
-
-No changes needed if you're using default settings. Adjust values in `backend/.env.docker` if needed.
-
-#### 3. **Build and Run with Docker Compose**
-
-```bash
-# Build all services
-docker compose build
-
-# Start all services
-docker compose up -d
-```
-
-Or use a single command:
 ```bash
 docker compose up -d --build
 ```
 
-#### 4. **Access the Application**
+**What this command does:**
+- ✅ Builds the backend image (FastAPI)
+- ✅ Builds the frontend image (React + Nginx)
+- ✅ Starts PostgreSQL database
+- ✅ Initializes the database with seed data
+- ✅ Runs all services in the background
 
-- **Frontend (Web UI):** http://localhost
-- **Backend API Docs:** http://localhost/api/docs
-- **API Alternative Docs:** http://localhost/api/redoc
+**First run takes ~2-3 minutes. Subsequent runs are much faster.**
 
-#### 5. **Stop the Application**
+#### **Step 3: Access the Application**
+
+Open these URLs in your browser:
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| **Application** | http://localhost | Interactive accountability map UI |
+| **API Documentation** | http://localhost/api/docs | Swagger UI for API testing |
+| **API ReDoc** | http://localhost/api/redoc | Alternative API documentation |
+
+All services should show as "healthy" ✅
+
+#### **Step 4: Stop the Application**
 
 ```bash
+# Stop all services (keeps data)
 docker compose down
+
+# Or remove everything including data
+docker compose down -v
 ```
 
-### Service Overview
+---
 
-| Service | Port | Description |
-|---------|------|-------------|
-| **Frontend** | 80 | React web application (Nginx) |
-| **Backend** | (internal) | FastAPI server |
-| **Database** | 5432 | PostgreSQL database |
-| **API Endpoint** | /api | Backend API with proxy |
+### 📊 Service Overview
 
-### Viewing Logs
+What's running in the background:
+
+| Service | Container | Port | Status |
+|---------|-----------|------|--------|
+| **Frontend** | aiacc-frontend | 80 | Nginx serving React build |
+| **Backend API** | aiacc-backend | 8000 (internal) | FastAPI server |
+| **Database** | aiacc-db | 5432 (internal) | PostgreSQL 15 |
+
+Database credentials (for Docker):
+- **User:** `aimap_user`
+- **Password:** `root`
+- **Database:** `ai_accountability`
+
+---
+
+### 🔍 Viewing Application Logs
+
+To see what's happening inside the containers:
 
 ```bash
-# View all services logs
+# View all services logs (live)
 docker compose logs -f
 
 # View specific service logs
-docker compose logs -f backend
-docker compose logs -f frontend
-docker compose logs -f db
+docker compose logs -f backend    # See backend errors/requests
+docker compose logs -f frontend   # See frontend errors
+docker compose logs -f db         # See database logs
+
+# View last 50 lines only
+docker compose logs --tail=50 backend
 ```
 
-### Database Access (Optional)
+---
 
-If you need to access the database directly:
+### 🗄️ Database Access (Optional)
+
+If you need to directly query the database:
 
 ```bash
-# Using PostgreSQL client installed locally
-psql -h localhost -p 8080 -U aimap_user -d ai_accountability
+# Access the database from command line
+docker compose exec db psql -U aimap_user -d ai_accountability
 
-# Or through Docker
-docker exec -it aiacc-db psql -U aimap_user -d ai_accountability
+# Some useful SQL commands:
+# \dt - List all tables
+# \d pipeline_stages - Describe a table
+# SELECT * FROM pipeline_stages; - View data
 ```
 
-**Default credentials:**
-- Username: `aimap_user`
-- Password: `root`
-- Database: `ai_accountability`
+---
 
-### Stopping and Cleaning Up
+### 🧹 Troubleshooting Docker
 
+**Port 80 already in use?**
 ```bash
-# Stop all services
-docker compose down
+# Edit docker-compose.yml and change:
+# ports: ["8080:80"]  # Then access at http://localhost:8080
+```
 
-# Remove all data (including database volume)
+**Want to start fresh?**
+```bash
+# Remove all containers and volumes
 docker compose down -v
 
-# Rebuild images from scratch
+# Rebuild everything from scratch
 docker compose build --no-cache
+docker compose up -d --build
 ```
 
-### Development Mode (Optional)
+**Check if services are healthy:**
+```bash
+docker compose ps
+# All should show STATUS: "Up X seconds (healthy)"
+```
 
-To run locally without Docker for development:
+**See detailed service info:**
+```bash
+docker compose logs -f
+```
 
-#### Backend Setup
+---
+
+### 💻 Development Mode (Optional - Without Docker)
+
+If you prefer local development without Docker:
+
+#### **Backend Setup**
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate          # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-python app/create_tables.py  # Initialize database
-uvicorn app.main:app --reload
+python app/create_tables.py        # Initialize database
+uvicorn app.main:app --reload      # Runs on http://localhost:8000
 ```
 
-#### Frontend Setup
+#### **Frontend Setup** (in a new terminal)
 ```bash
 cd frontend
 npm install
-npm start
+npm start                          # Runs on http://localhost:3000
 ```
+
+⚠️ **Note:** This requires Python 3.10+, Node.js 18+, and PostgreSQL running separately.
+
+---
+
+### 📚 More Information
+
+For detailed information about Docker setup, see:
+- **DOCKER.md** - Comprehensive Docker guide with advanced options
+- **DOCKER_QUICK_REFERENCE.md** - Command reference and cheatsheet
+- **.env.example** - Configuration options available
 
 ### Troubleshooting
 
